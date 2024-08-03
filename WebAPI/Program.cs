@@ -1,9 +1,11 @@
+using NLog;
 using Presentation;
 using WebAPI.Extensions;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
+LogManager.Setup().LoadConfigurationFromFile(String.Concat(Directory.GetCurrentDirectory(),"/nlog.config"));
 
 builder.Services.AddControllers()
     .AddApplicationPart(typeof(AssemblyReference).Assembly)
@@ -17,6 +19,7 @@ builder.Services.ConfigureIBookRepository();
 builder.Services.ConfigureRepositoryManager();
 builder.Services.ConfigureBookService();
 builder.Services.ConfigureServiceManager();
+builder.Services.ConfigureLoggerService();
     
 var app = builder.Build();
 

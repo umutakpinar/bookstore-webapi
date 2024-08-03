@@ -6,6 +6,15 @@
 # dotenv files
 .env
 
+# for log files/internal_logs.*
+# internal_logs klasörünü ve altındaki tüm dosyaları hariç tut
+internal_logs/
+WebAPI/.\\internal_logs\\*
+
+# Sonu logfile.txt ile biten dosyaları hariç tut
+*logfile.txt
+
+
 #LocalDatabase.db
 *LocalDatabase.*
 

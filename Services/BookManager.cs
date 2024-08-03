@@ -1,4 +1,5 @@
 using Entities.Models;
+using NLog;
 using Repositories.Contracts;
 using Services.Contracts;
 using Exception = System.Exception;
@@ -8,10 +9,12 @@ namespace Services;
 public class BookManager : IBookService
 {
     private IRepositoryManager _manager;
+    private ILoggerService _logger;
 
-    public BookManager(IRepositoryManager manager)
+    public BookManager(IRepositoryManager manager, ILoggerService logger)
     {
         _manager = manager;
+        _logger = logger;
     }
 
     public IEnumerable<Book> GetAllBooks(bool trackChanges)
@@ -48,7 +51,10 @@ public class BookManager : IBookService
         var entity = _manager.BookRepo.GetBookById(id, trackChanges);
 
         if (entity is null)
+        {
+            _logger.LogInfo($"There is no book with this id {id}");
             throw new Exception($"There is no book with this id {id}");
+        }
 
         entity.Title = book.Title;
         entity.Price = book.Price;
@@ -62,7 +68,10 @@ public class BookManager : IBookService
         var entity = _manager.BookRepo.GetBookById(id, trackChanges);
 
         if (entity is null)
+        {
+            _logger.LogInfo($"The book with id:{id} could not found.");
             throw new Exception($"There is no book with this id {id}");
+        }
         
         _manager.BookRepo.DeleteBook(entity);
         _manager.Save();
