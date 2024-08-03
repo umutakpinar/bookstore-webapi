@@ -1,19 +1,23 @@
-using Microsoft.EntityFrameworkCore;
-using WebAPI.Repositories;
+using Presentation;
+using WebAPI.Extensions;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 
-builder.Services.AddControllers();
+builder.Services.AddControllers()
+    .AddApplicationPart(typeof(AssemblyReference).Assembly)
+    .AddNewtonsoftJson();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-builder.Services.AddDbContext<RepositoryContext>(
-    optionsBuilder => optionsBuilder.UseOracle(builder.Configuration.GetConnectionString("OracleSQLConnection"))
-    );
-
+builder.Services.ConfigureSqlContext(builder.Configuration);
+builder.Services.ConfigureIBookRepository();
+builder.Services.ConfigureRepositoryManager();
+builder.Services.ConfigureBookService();
+builder.Services.ConfigureServiceManager();
+    
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.

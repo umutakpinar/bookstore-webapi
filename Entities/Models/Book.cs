@@ -1,4 +1,4 @@
-namespace WebAPI.Model;
+namespace Entities.Models;
 
 public class Book
 {

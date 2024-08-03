@@ -1,8 +1,9 @@
+using Entities.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using WebAPI.Model;
 
-namespace WebAPI.Repositories.Config;
+namespace Repositories.EFCore.Config;
+
 
 //for creating duummy data if nothing inside Books table
 public class BookConfig : IEntityTypeConfiguration<Book>

@@ -6,6 +6,9 @@
 # dotenv files
 .env
 
+#LocalDatabase.db
+*LocalDatabase.*
+
 # User-specific files
 *.rsuser
 *.suo
