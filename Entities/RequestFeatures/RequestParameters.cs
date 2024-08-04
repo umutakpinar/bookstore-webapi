@@ -9,8 +9,7 @@ public abstract class RequestParameters
     private int _pageSize;
     
     public int PageNumber { get; set; }
-
-    [Range(1,_maxPageSize)]
+    
     public int PageSize
     {
         get
