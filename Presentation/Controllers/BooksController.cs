@@ -1,3 +1,4 @@
+using Entities.DataTransferObjects;
 using Entities.Exceptions;
 using Entities.Models;
 using Microsoft.AspNetCore.JsonPatch;
@@ -34,7 +35,7 @@ public class BooksController : ControllerBase
     }
 
     [HttpPost]
-    public IActionResult CreateOneBook([FromBody] Book? book)
+    public IActionResult CreateOneBook([FromBody] Book book)
     {
         var addedEntity = _manager.BookService.CreateOneBook(book);
         return StatusCode(201,addedEntity);
@@ -43,10 +44,13 @@ public class BooksController : ControllerBase
     [HttpPut("{id:int}")]
     public IActionResult UpdateBook([FromRoute(Name = "id")] int id, [FromBody] Book book)
     {
-        if (book.Id != id)
-            return BadRequest("Route id ve gönderilen kitap id eşleşmiyor.");
         book.Id = id; // ihtiyac yok gibi ama yine de :/
-        _manager.BookService.UpdateOneBook(id, book, true);
+        _manager.BookService.UpdateOneBook(id, new BookDtoForUpdate()
+        {
+            Id = book.Id,
+            Price = book.Price,
+            Title = book.Title
+        }, true);
         
         return NoContent();
     }
@@ -63,7 +67,12 @@ public class BooksController : ControllerBase
     {
         var entity = _manager.BookService.GetOneBookById(id, true);
         bookPatch.ApplyTo(entity);
-        _manager.BookService.UpdateOneBook(id,entity,true);
+        _manager.BookService.UpdateOneBook(id,new BookDtoForUpdate()
+        {
+            Id = entity.Id,
+            Price = entity.Price,
+            Title = entity.Title
+        },true);
         return NoContent();
     }
 }

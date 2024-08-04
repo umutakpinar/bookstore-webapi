@@ -8,7 +8,7 @@ namespace Entities.DataTransferObjects;
 // ctor
 public record BookDtoForUpdate
 {
-    public int Id { get; init; }
-    public String Title { get; init; }
-    public decimal Price { get; init; }
+    public int Id { get; set; }
+    public String Title { get; set; }
+    public decimal Price { get; set; }
 }

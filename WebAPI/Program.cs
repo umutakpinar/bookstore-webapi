@@ -2,6 +2,7 @@ using NLog;
 using Presentation;
 using Services.Contracts;
 using WebAPI.Extensions;
+using WebAPI.Utilities.AutoMapper;
 
 var builder = WebApplication.CreateBuilder(args);
 
