@@ -18,8 +18,8 @@ public class RepositoryManager : IRepositoryManager
     // burada birden fazla repository olabilir sadece birinde değişiklik yaptıysak diğerlerinden instance  oluşturmaya gerek yok o nedenle yukarıda Lazy loading yyaısı kurduk
     public IBookRepository BookRepo => _bookRepository.Value;
     
-    public void Save()
+    public async Task SaveAsync()
     {
-        _context.SaveChanges();
+        await _context.SaveChangesAsync();
     }
 }

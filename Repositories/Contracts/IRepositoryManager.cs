@@ -5,5 +5,5 @@ namespace Repositories.Contracts;
 public interface IRepositoryManager
 { 
     IBookRepository BookRepo { get; }
-    void Save();
+    Task SaveAsync();
 }
