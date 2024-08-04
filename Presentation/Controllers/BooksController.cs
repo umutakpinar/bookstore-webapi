@@ -3,7 +3,6 @@ using Entities.Exceptions;
 using Entities.Models;
 using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Routing;
 using Services.Contracts;
 
 namespace Presentation.Controllers;
@@ -36,9 +35,12 @@ public class BooksController : ControllerBase
     }
 
     [HttpPost]
-    public IActionResult CreateOneBook([FromBody] Book book)
+    public IActionResult CreateOneBook([FromBody] BookDtoForInsertion bookDtoForInsertion)
     {
-        var addedEntity = _manager.BookService.CreateOneBook(book);
+        if (!ModelState.IsValid)
+            return UnprocessableEntity(ModelState);
+        
+        var addedEntity = _manager.BookService.CreateOneBook(bookDtoForInsertion);
         return StatusCode(201,addedEntity);
     }
 
@@ -64,16 +66,23 @@ public class BooksController : ControllerBase
     }
 
     [HttpPatch("{id:int}")]
-    public IActionResult PartiallyUpdateOneBook([FromRoute(Name = "id")]int id, [FromBody]JsonPatchDocument<Book> bookPatch)
+    public IActionResult PartiallyUpdateOneBook([FromRoute(Name = "id")]int id, [FromBody]JsonPatchDocument<BookDtoForUpdate> bookDtoPatch)
     {
-        var entity = _manager.BookService.GetOneBookById(id, true);
-        bookPatch.ApplyTo(entity);
-        _manager.BookService.UpdateOneBook(id,new BookDtoForUpdate()
-        {
-            Id = entity.Id,
-            Price = entity.Price,
-            Title = entity.Title
-        },true);
+        var result = _manager.BookService.GetOneBookForPatch(id, true);
+        bookDtoPatch.ApplyTo(result.bookDtoForUpdate, ModelState);
+        
+        TryValidateModel(result.bookDtoForUpdate);
+        
+        if (!ModelState.IsValid)
+            return UnprocessableEntity(ModelState); //422
+        
+        // _manager.BookService.UpdateOneBook(id,new BookDtoForUpdate()
+        // {
+        //     Id = result.bookDtoForUpdate.Id,
+        //     Price = result.bookDtoForUpdate.Price,
+        //     Title = result.bookDtoForUpdate.Title
+        // },true);
+        _manager.BookService.SaveChangesForPatch(bookDtoForUpdate: result.bookDtoForUpdate, result.book);
         return NoContent();
     }
 }

@@ -29,24 +29,26 @@ public class BookManager : IBookService
         return x;
     }
 
-    public Book GetOneBookById(int id, bool trackChanges)
+    public BookDto GetOneBookById(int id, bool trackChanges)
     {
         var book = _manager.BookRepo.GetBookById(id, trackChanges);
 
         if (book is null)
             throw new BookNotFoundException(id);
-        
-        return book;
+
+        return _mapper.Map<BookDto>(book);
     }
 
-    public Book CreateOneBook(Book? book)
+    public BookDto CreateOneBook(BookDtoForInsertion bookDtoForInsertion)
     {
-        if (book is null)
+        if (bookDtoForInsertion is null)
             throw new ArgumentNullException();
+
+        var book = _mapper.Map<Book>(bookDtoForInsertion);
         
         var entity = _manager.BookRepo.CreateBook(book);
         _manager.Save();
-        return entity;
+        return _mapper.Map<BookDto>(entity);
     }
 
     public void UpdateOneBook(int id, BookDtoForUpdate bookDto, bool trackChanges)
@@ -76,6 +78,24 @@ public class BookManager : IBookService
             throw new BookNotFoundException(id);
         
         _manager.BookRepo.DeleteBook(entity);
+        _manager.Save();
+    }
+
+    public (BookDtoForUpdate bookDtoForUpdate, Book book) GetOneBookForPatch(int id, bool trackChanges)
+    {
+        var book = _manager.BookRepo.GetBookById(id, trackChanges);
+        
+        if (book is null)
+            throw new BookNotFoundException(id);
+
+        var bookDtoForUpdate = _mapper.Map<BookDtoForUpdate>(book);
+
+        return (bookDtoForUpdate, book);
+    }
+
+    public void SaveChangesForPatch(BookDtoForUpdate bookDtoForUpdate, Book book)
+    {
+        _mapper.Map(bookDtoForUpdate, book);
         _manager.Save();
     }
 }

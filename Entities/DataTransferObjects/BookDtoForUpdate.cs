@@ -1,3 +1,5 @@
+using System.ComponentModel.DataAnnotations;
+
 namespace Entities.DataTransferObjects;
 
 // dto objeleri
@@ -6,9 +8,8 @@ namespace Entities.DataTransferObjects;
 // LINQ
 // Ref type
 // ctor
-public record BookDtoForUpdate
+public record BookDtoForUpdate : BookDtoForManipulation
 {
+    [Required]
     public int Id { get; init; }
-    public String Title { get; init; }
-    public decimal Price { get; init; }
 }

@@ -8,8 +8,8 @@ public class MappingProfile : Profile
 {
     public MappingProfile()
     {
-        CreateMap<BookDtoForUpdate, Book>();
-        CreateMap<Book, BookDto>();
-        ;
+        CreateMap<BookDtoForUpdate, Book>().ReverseMap();
+        CreateMap<Book, BookDto>().ReverseMap();
+        CreateMap<BookDtoForInsertion, Book>().ReverseMap();
     }
 }

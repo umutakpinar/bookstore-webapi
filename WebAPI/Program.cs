@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Mvc;
 using NLog;
 using Presentation;
 using Services.Contracts;
@@ -19,6 +20,13 @@ builder.Services.AddControllers(
     .AddXmlDataContractSerializerFormatters()
     .AddApplicationPart(typeof(AssemblyReference).Assembly)
     .AddNewtonsoftJson();
+
+//ModelState invalid olduğunda 400 donmesin ancak bu durumda ModelState'in valid lup olmadigini check etmelisin
+builder.Services.Configure<ApiBehaviorOptions>(options =>
+{
+    options.SuppressModelStateInvalidFilter = true;
+});
+
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
