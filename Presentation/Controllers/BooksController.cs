@@ -3,6 +3,7 @@ using Entities.Exceptions;
 using Entities.Models;
 using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
+using Presentation.ActionFilters;
 using Services.Contracts;
 
 namespace Presentation.Controllers;
@@ -33,27 +34,23 @@ public class BooksController : ControllerBase
                 throw new BookNotFoundException(id);
             return Ok(book);
     }
-
+    
     [HttpPost]
+    [ServiceFilter(typeof(IsModelStateNotValid))]
     public async Task<IActionResult> CreateOneBookAsync([FromBody] BookDtoForInsertion bookDtoForInsertion)
     {
-        if (!ModelState.IsValid)
-            return UnprocessableEntity(ModelState);
+        // if (!ModelState.IsValid)
+        //     return UnprocessableEntity(ModelState);
         
         var addedEntity = await _manager.BookService.CreateOneBookAsync(bookDtoForInsertion);
         return StatusCode(201,addedEntity);
     }
 
     [HttpPut("{id:int}")]
-    public async Task<IActionResult> UpdateBook([FromRoute(Name = "id")] int id, [FromBody] Book book)
+    [ServiceFilter(typeof(IsModelStateNotValid))]
+    public async Task<IActionResult> UpdateBookAsync([FromRoute(Name = "id")] int id, [FromBody] BookDtoForUpdate bookDto)
     {
-        book.Id = id; // ihtiyac yok gibi ama yine de :/
-        await _manager.BookService.UpdateOneBookAsync(id, new BookDtoForUpdate()
-        {
-            Id = book.Id,
-            Price = book.Price,
-            Title = book.Title
-        }, true);
+        await _manager.BookService.UpdateOneBookAsync(id, bookDto, true);
         
         return NoContent();
     }
@@ -65,7 +62,9 @@ public class BooksController : ControllerBase
         return NoContent();
     }
 
+    
     [HttpPatch("{id:int}")]
+    [ServiceFilter(typeof(IsModelStateNotValid))]
     public async Task<IActionResult> PartiallyUpdateOneBookAsync([FromRoute(Name = "id")]int id, [FromBody]JsonPatchDocument<BookDtoForUpdate> bookDtoPatch)
     {
         var result = await _manager.BookService.GetOneBookForPatchAsync(id, true);
@@ -73,8 +72,8 @@ public class BooksController : ControllerBase
         
         TryValidateModel(result.bookDtoForUpdate);
         
-        if (!ModelState.IsValid)
-            return UnprocessableEntity(ModelState); //422
+        // if (!ModelState.IsValid)
+        //     return UnprocessableEntity(ModelState); //422
         
         // _manager.BookService.UpdateOneBook(id,new BookDtoForUpdate()
         // {

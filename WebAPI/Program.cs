@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using NLog;
 using Presentation;
+using Presentation.ActionFilters;
 using Services.Contracts;
 using WebAPI.Extensions;
 using WebAPI.Utilities.AutoMapper;
@@ -38,6 +39,7 @@ builder.Services.ConfigureBookService();
 builder.Services.ConfigureServiceManager();
 builder.Services.ConfigureLoggerService();
 builder.Services.AddAutoMapper(typeof(Program));
+builder.Services.AddScoped<IsModelStateNotValid>(); // IoC'ye action filteri verdik
     
 var app = builder.Build();
 
