@@ -39,7 +39,7 @@ builder.Services.ConfigureBookService();
 builder.Services.ConfigureServiceManager();
 builder.Services.ConfigureLoggerService();
 builder.Services.AddAutoMapper(typeof(Program));
-builder.Services.AddScoped<IsModelStateNotValid>(); // IoC'ye action filteri verdik
+builder.Services.ConfigureActionFilters(); // IoC'ye action filteri verdik
     
 var app = builder.Build();
 

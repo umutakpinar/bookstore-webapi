@@ -30,10 +30,7 @@ public class BookManager : IBookService
 
     public async Task<BookDto> GetOneBookByIdAsync(int id, bool trackChanges)
     {
-        var book = await _manager.BookRepo.GetBookByIdAsync(id, trackChanges);
-
-        if (book is null)
-            throw new BookNotFoundException(id);
+        var book = await GetBookByIdAndCheckExist(id,trackChanges);
 
         return _mapper.Map<BookDto>(book);
     }
@@ -54,11 +51,9 @@ public class BookManager : IBookService
     {
         if (id != bookDto.Id)
             throw new Exception($"BookId and id is not same.");
-        
-        var entity = await _manager.BookRepo.GetBookByIdAsync(id, false);
 
-        if (entity is null)
-            throw new BookNotFoundException(id);
+        Book entity;
+        await GetBookByIdAndCheckExist(id,trackChanges);
 
         //Mapping
         // entity.Title = book.Title;
@@ -71,10 +66,7 @@ public class BookManager : IBookService
 
     public async Task DeleteOneBookAsync(int id, bool trackChanges)
     {
-        var entity = await _manager.BookRepo.GetBookByIdAsync(id, trackChanges);
-
-        if (entity is null)
-            throw new BookNotFoundException(id);
+        var entity = await GetBookByIdAndCheckExist(id,trackChanges);
         
         _manager.BookRepo.DeleteBook(entity);
         await _manager.SaveAsync();
@@ -82,10 +74,7 @@ public class BookManager : IBookService
 
     public async Task<(BookDtoForUpdate bookDtoForUpdate, Book book)> GetOneBookForPatchAsync(int id, bool trackChanges)
     {
-        var book = await _manager.BookRepo.GetBookByIdAsync(id, trackChanges);
-        
-        if (book is null)
-            throw new BookNotFoundException(id);
+        var book = await GetBookByIdAndCheckExist(id,trackChanges);
 
         var bookDtoForUpdate = _mapper.Map<BookDtoForUpdate>(book);
 
@@ -97,4 +86,15 @@ public class BookManager : IBookService
         _mapper.Map(bookDtoForUpdate, book);
         await _manager.SaveAsync();
     }
+
+    private async Task<Book> GetBookByIdAndCheckExist(int id, bool trackChanges)
+    {
+        var book = await _manager.BookRepo.GetBookByIdAsync(id, trackChanges);
+        
+        if (book is null)
+            throw new BookNotFoundException(id);
+
+        return book;
+    }
 }
+
