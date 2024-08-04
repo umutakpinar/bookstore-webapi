@@ -22,10 +22,11 @@ public class BookManager : IBookService
         _mapper = mapper;
     }
 
-    public IEnumerable<Book> GetAllBooks(bool trackChanges)
+    public IEnumerable<BookDto> GetAllBooks(bool trackChanges)
     {
         var books = _manager.BookRepo.GetAllBooks(trackChanges);
-        return books;
+        var x = _mapper.Map<IEnumerable<BookDto>>(books);
+        return x;
     }
 
     public Book GetOneBookById(int id, bool trackChanges)

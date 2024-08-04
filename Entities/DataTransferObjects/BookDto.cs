@@ -1,12 +1,7 @@
 namespace Entities.DataTransferObjects;
 
-// dto objeleri
-// readonly
-// immutable
-// LINQ
-// Ref type
-// ctor
-public record BookDtoForUpdate
+[Serializable]
+public record BookDto
 {
     public int Id { get; init; }
     public String Title { get; init; }
