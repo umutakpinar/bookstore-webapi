@@ -17,6 +17,7 @@ public sealed class BookRepository : RepositoryBase<Book>, IBookRepository
     {
         var books =  await FindAll(trackChanges)
             .FilterBookPrice(bookParameters.MinPrice,bookParameters.MaxPrice)
+            .SearchBookWithTitle(bookParameters.SearchTerm)
             .OrderBy(b => b.Id)
             .ToListAsync();
         return PagedList<Book>.ToPagedList(

@@ -9,4 +9,9 @@ public static class BookRepositoryExtensions
     {
         return books.Where(b => b.Price >= minPrice && b.Price <= maxPrice);
     }
+
+    public static IQueryable<Book> SearchBookWithTitle(this IQueryable<Book> books, string? searchTerm)
+    {
+        return searchTerm is not null ? books.Where(b => b.Title.ToLower().Contains(searchTerm.ToLower())) : books;
+    }
 }
