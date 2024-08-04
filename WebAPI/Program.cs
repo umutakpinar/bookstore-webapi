@@ -40,6 +40,7 @@ builder.Services.ConfigureServiceManager();
 builder.Services.ConfigureLoggerService();
 builder.Services.AddAutoMapper(typeof(Program));
 builder.Services.ConfigureActionFilters(); // IoC'ye action filteri verdik
+builder.Services.ConfigureCors();
     
 var app = builder.Build();
 
@@ -56,6 +57,8 @@ if (app.Environment.IsProduction())
 {
     app.UseHsts();
 }
+
+app.UseCors("CorsPolicy");
 
 app.UseHttpsRedirection();
 

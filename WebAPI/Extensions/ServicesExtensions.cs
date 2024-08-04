@@ -40,4 +40,17 @@ public static class ServicesExtensions
         services.AddScoped<IsModelStateNotValid>();
         services.AddSingleton<LoggerAction>();
     }
+    
+    // CORS policy ayarlamak icin
+    public static void ConfigureCors(this IServiceCollection services)
+    {
+        services.AddCors(options => options.AddPolicy("CorsPolicy", builder =>
+            builder
+                .AllowAnyOrigin()
+                .AllowAnyMethod()
+                .AllowAnyHeader()
+                .WithExposedHeaders("X-Pagination")
+            )
+        );
+    }
 }

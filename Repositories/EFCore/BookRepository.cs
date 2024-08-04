@@ -1,4 +1,5 @@
 using Entities.Models;
+using Entities.RequestFeatures;
 using Microsoft.EntityFrameworkCore;
 using Repositories.Contracts;
 
@@ -11,9 +12,16 @@ public class BookRepository : RepositoryBase<Book>, IBookRepository
     }
     
     // bunlar IBookRepository interfacesinden gelen metotlar
-    public async Task<IEnumerable<Book>> GetAllBooksAsync(bool trackChanges) 
+    public async Task<PagedList<Book>> GetAllBooksAsync(BookParameters bookParameters, bool trackChanges) 
     {
-        return await FindAll(trackChanges).OrderBy(b => b.Id).ToListAsync();
+        var books =  await FindAll(trackChanges)
+            .OrderBy(b => b.Id)
+            .ToListAsync();
+        return PagedList<Book>.ToPagedList(
+                source: books,
+                pageNumber: bookParameters.PageNumber,
+                pageSize: bookParameters.PageSize
+            );
     }
 
     // Ornegin ana RepositoryBase yapisisindan burada kopuyor o nedenle IBookRepository icinde de eklemeli bu sekilde
