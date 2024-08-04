@@ -1,3 +1,4 @@
+using Entities.Exceptions;
 using Entities.Models;
 using NLog;
 using Repositories.Contracts;
@@ -26,10 +27,10 @@ public class BookManager : IBookService
     public Book GetOneBookById(int id, bool trackChanges)
     {
         var book = _manager.BookRepo.GetBookById(id, trackChanges);
-        
-        if (book is null)
-            throw new Exception($"There is no book with this id {id}");
 
+        if (book is null)
+            throw new BookNotFoundException(id);
+        
         return book;
     }
 
@@ -51,10 +52,7 @@ public class BookManager : IBookService
         var entity = _manager.BookRepo.GetBookById(id, trackChanges);
 
         if (entity is null)
-        {
-            _logger.LogInfo($"There is no book with this id {id}");
-            throw new Exception($"There is no book with this id {id}");
-        }
+            throw new BookNotFoundException(id);
 
         entity.Title = book.Title;
         entity.Price = book.Price;
@@ -68,10 +66,7 @@ public class BookManager : IBookService
         var entity = _manager.BookRepo.GetBookById(id, trackChanges);
 
         if (entity is null)
-        {
-            _logger.LogInfo($"The book with id:{id} could not found.");
-            throw new Exception($"There is no book with this id {id}");
-        }
+            throw new BookNotFoundException(id);
         
         _manager.BookRepo.DeleteBook(entity);
         _manager.Save();
