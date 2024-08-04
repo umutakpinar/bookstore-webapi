@@ -1,3 +1,4 @@
+using System.Dynamic;
 using AutoMapper;
 using Entities.DataTransferObjects;
 using Entities.Exceptions;
@@ -15,15 +16,21 @@ public class BookManager : IBookService
     private readonly IRepositoryManager _manager;
     private readonly ILoggerService _logger;
     private readonly IMapper _mapper;
+    private readonly IDataShaper<BookDto> _shaper;
 
-    public BookManager(IRepositoryManager manager, ILoggerService logger, IMapper mapper)
+    public BookManager(
+        IRepositoryManager manager,
+        ILoggerService logger,
+        IMapper mapper,
+        IDataShaper<BookDto> shaper)
     {
         _manager = manager;
         _logger = logger;
         _mapper = mapper;
+        _shaper = shaper;
     }
 
-    public async Task<(IEnumerable<BookDto> books, MetaData metaData)> GetAllBooksAsync(
+    public async Task<(IEnumerable<ExpandoObject> books, MetaData metaData)> GetAllBooksAsync(
         BookParameters bookParameters, bool trackChanges)
     {
         if (!bookParameters.ValidPriceRange)
@@ -31,7 +38,8 @@ public class BookManager : IBookService
             
         var booksWithMetaData = await _manager.BookRepo.GetAllBooksAsync(bookParameters, trackChanges);
         var booksDto = _mapper.Map<IEnumerable<BookDto>>(booksWithMetaData);
-        return (booksDto, booksWithMetaData.MetaData);
+        var shapedData = _shaper.ShapeData(booksDto, bookParameters.Fields);
+        return (books: shapedData, metaData: booksWithMetaData.MetaData);
     }
 
     public async Task<BookDto> GetOneBookByIdAsync(int id, bool trackChanges)
