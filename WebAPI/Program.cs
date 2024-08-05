@@ -12,15 +12,15 @@ var builder = WebApplication.CreateBuilder(args);
 LogManager.Setup().LoadConfigurationFromFile(String.Concat(Directory.GetCurrentDirectory(),"/nlog.config"));
 
 builder.Services.AddControllers(
-            config =>
-            {
-                config.RespectBrowserAcceptHeader = true;
-                config.ReturnHttpNotAcceptable = true;
-            })
+        config =>
+        {
+            config.RespectBrowserAcceptHeader = true;
+            config.ReturnHttpNotAcceptable = true;
+        })
     .AddCustomCsvOutputFormatter()
     .AddXmlDataContractSerializerFormatters()
-    .AddApplicationPart(typeof(AssemblyReference).Assembly)
-    .AddNewtonsoftJson();
+    .AddApplicationPart(typeof(AssemblyReference).Assembly);
+    // .AddNewtonsoftJson();
 
 //ModelState invalid olduğunda 400 donmesin ancak bu durumda ModelState'in valid lup olmadigini check etmelisin
 builder.Services.Configure<ApiBehaviorOptions>(options =>
