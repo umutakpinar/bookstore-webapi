@@ -1,4 +1,6 @@
 using Entities.DataTransferObjects;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Formatters;
 using Microsoft.EntityFrameworkCore;
 using Presentation.ActionFilters;
 using Repositories.Contracts;
@@ -40,6 +42,7 @@ public static class ServicesExtensions
     {
         services.AddScoped<IsModelStateNotValid>();
         services.AddSingleton<LoggerAction>();
+        services.AddScoped<ValidateMediaType>();
     }
     
     // CORS policy ayarlamak icin
@@ -59,4 +62,32 @@ public static class ServicesExtensions
     {
         services.AddScoped<IDataShaper<BookDto>, DataShaper<BookDto>>();
     }
+    
+    // for hateoas
+    public static void AddCustomMediaTypes(this IServiceCollection services)
+    {
+        services.Configure<MvcOptions>(config =>
+        {
+            var systemTextJsonOutputFormatter = config
+                .OutputFormatters
+                .OfType<SystemTextJsonOutputFormatter>().FirstOrDefault();
+
+            if (systemTextJsonOutputFormatter is not null)
+                systemTextJsonOutputFormatter
+                    .SupportedMediaTypes
+                    .Add("application/vnd.umutakpinar.hateoas+json"); // vnd = vendor
+
+            var xmlOutputFormatter = config
+                .OutputFormatters
+                .OfType<XmlDataContractSerializerOutputFormatter>()
+                .FirstOrDefault();
+            
+            if(xmlOutputFormatter is not null)
+                xmlOutputFormatter
+                    .SupportedMediaTypes
+                    .Add("application/vnd.umutakpinar.hateoas+xml");
+        });
+    }
+    
+    
 }

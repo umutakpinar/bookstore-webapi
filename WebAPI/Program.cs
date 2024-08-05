@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Mvc;
 using NLog;
 using Presentation;
 using Presentation.ActionFilters;
+using Services;
 using Services.Contracts;
 using WebAPI.Extensions;
 using WebAPI.Utilities.AutoMapper;
@@ -12,15 +13,15 @@ var builder = WebApplication.CreateBuilder(args);
 LogManager.Setup().LoadConfigurationFromFile(String.Concat(Directory.GetCurrentDirectory(),"/nlog.config"));
 
 builder.Services.AddControllers(
-            config =>
-            {
-                config.RespectBrowserAcceptHeader = true;
-                config.ReturnHttpNotAcceptable = true;
-            })
-    .AddCustomCsvOutputFormatter()
+        config =>
+        {
+            config.RespectBrowserAcceptHeader = true;
+            config.ReturnHttpNotAcceptable = true;
+        })
     .AddXmlDataContractSerializerFormatters()
-    .AddApplicationPart(typeof(AssemblyReference).Assembly)
-    .AddNewtonsoftJson();
+    .AddCustomCsvOutputFormatter()
+    .AddApplicationPart(typeof(AssemblyReference).Assembly);
+    // .AddNewtonsoftJson();
 
 //ModelState invalid olduğunda 400 donmesin ancak bu durumda ModelState'in valid lup olmadigini check etmelisin
 builder.Services.Configure<ApiBehaviorOptions>(options =>
@@ -42,6 +43,8 @@ builder.Services.AddAutoMapper(typeof(Program));
 builder.Services.ConfigureActionFilters(); // IoC'ye action filteri verdik
 builder.Services.ConfigureCors();
 builder.Services.ConfigureDataShaper();
+builder.Services.AddCustomMediaTypes(); //xml json hateos config
+builder.Services.AddScoped<IBookLinks, BookLinks>();
     
 var app = builder.Build();
 
