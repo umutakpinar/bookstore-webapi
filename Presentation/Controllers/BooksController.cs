@@ -22,7 +22,8 @@ public class BooksController : ControllerBase
         _manager = manager;
     }
 
-    [HttpGet]
+    // [HttpHead] Govde olmadan sadece header donmek
+    [HttpGet(Name = "GetAllBooksAsync")]
     public async Task<IActionResult> GetAllBooksAsync([FromQuery]BookParameters bookParameters)
     {
         var pagedResult = await _manager
@@ -42,7 +43,7 @@ public class BooksController : ControllerBase
             return Ok(book);
     }
     
-    [HttpPost]
+    [HttpPost(Name = "CreateOneBookAsync")]
     [ServiceFilter(typeof(IsModelStateNotValid))]
     public async Task<IActionResult> CreateOneBookAsync([FromBody] BookDtoForInsertion bookDtoForInsertion)
     {
@@ -91,4 +92,12 @@ public class BooksController : ControllerBase
         await _manager.BookService.SaveChangesForPatchAsync(bookDtoForUpdate: result.bookDtoForUpdate, result.book);
         return NoContent();
     }
+
+    [HttpOptions]
+    public IActionResult GetApiOptions()
+    {
+        Response.Headers.Append("Allow","GET, PUT, POST, PATCH, DELETE, OPTIONS, HEAD");
+        return Ok();
+    }
+
 }
